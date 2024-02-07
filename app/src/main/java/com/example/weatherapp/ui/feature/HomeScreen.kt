@@ -26,18 +26,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherapp.R
+import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.ui.theme.DarkBlue
 import com.example.weatherapp.ui.theme.LightBlue
 import com.example.weatherapp.ui.theme.White
 import com.example.weatherapp.ui.theme.gradiantBlue1
 import com.example.weatherapp.ui.theme.gradiantBlue2
 import com.example.weatherapp.ui.theme.noColor
+import com.example.weatherapp.viewModel.HomeViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(homeViewModel: HomeViewModel) {
 
-    val iconPhrase = "Snowy"
-    val temp = 20
+    homeViewModel.searchByGeoPosition("35.6950453,52.0321925")
+
+    val data = homeViewModel.search5day.value
+
+    val iconPhrase = "data[0].Day.IconPhrase"
+    val temp = data[0].Temperature.Minimum.Value
     val temperature = ((temp - 32) / 1.8).toInt()
     val time = "12:20"
 
@@ -69,7 +75,7 @@ fun HomeScreen() {
             )
     ) {
 
-        HomeScreenToolbar("Tehran", iconPhrase)
+        HomeScreenToolbar(homeViewModel.city.value, "data[0].Day.IconPhrase")
         WeatherStatus(time , iconPhrase , temperature)
 
     }
@@ -134,10 +140,14 @@ fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
                 }
 
                 "Snowy" -> {
-                    R.drawable.snowy
+                    R.drawable.mostly_sunny
                 }
 
-                "Sunny" -> {
+                "Clear" -> {
+                    R.drawable.suny
+                }
+
+                "Mostly sunny" -> {
                     R.drawable.suny
                 }
 
@@ -497,4 +507,3 @@ fun ForecastHourItem(time: String, iconPhrase: String, temperature: Int) {
     }
 
 }
-
