@@ -1,5 +1,8 @@
 package com.example.weatherapp.ui.feature
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherapp.R
 import com.example.weatherapp.model.dataClass.DailyForecast
+import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.ui.theme.DarkBlue
 import com.example.weatherapp.ui.theme.LightBlue
 import com.example.weatherapp.ui.theme.White
@@ -34,18 +38,24 @@ import com.example.weatherapp.ui.theme.gradiantBlue1
 import com.example.weatherapp.ui.theme.gradiantBlue2
 import com.example.weatherapp.ui.theme.noColor
 import com.example.weatherapp.viewModel.HomeViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(homeViewModel: HomeViewModel) {
 
     homeViewModel.searchByGeoPosition("35.6950453,52.0321925")
 
-    val data = homeViewModel.search5day.value
+    val data5Day = homeViewModel.search5DayForecast()
+    val data12Hour = homeViewModel.search12HourForecast()
 
-    val iconPhrase = "data[0].Day.IconPhrase"
-    val temp = data[0].Temperature.Minimum.Value
+    Log.v("Dataget", data12Hour.toString())
+
+    val iconPhrase = data5Day[0].Day.IconPhrase
+    val temp = data5Day[0].Temperature.Minimum.Value
     val temperature = ((temp - 32) / 1.8).toInt()
-    val time = "12:20"
+
 
 
     Column(
@@ -76,7 +86,8 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
     ) {
 
         HomeScreenToolbar(homeViewModel.city.value, "data[0].Day.IconPhrase")
-        WeatherStatus(time , iconPhrase , temperature)
+
+        WeatherStatus(data5Day, data12Hour, iconPhrase, temperature)
 
     }
 
@@ -116,8 +127,14 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String) {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
+fun WeatherStatus(
+    data5Day: List<DailyForecast>,
+    data12Hour: List<Search12HourForecast>,
+    iconPhrase: String,
+    temperature: Int
+) {
 
     Column(
         modifier = Modifier
@@ -128,11 +145,23 @@ fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
     ) {
 
         AsyncImage(
-            modifier = Modifier.size(160.dp),
+            modifier = Modifier.size(130.dp),
             contentDescription = null,
-            model = when (iconPhrase) {
+            model = when (data5Day[0].Day.IconPhrase) {
                 "Cloudy" -> {
                     R.drawable.cloudy
+                }
+
+                "Mostly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Partly sunny" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Lightning" -> {
@@ -140,14 +169,10 @@ fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
                 }
 
                 "Snowy" -> {
-                    R.drawable.mostly_sunny
+                    R.drawable.snowy
                 }
 
-                "Clear" -> {
-                    R.drawable.suny
-                }
-
-                "Mostly sunny" -> {
+                "Sunny" -> {
                     R.drawable.suny
                 }
 
@@ -165,12 +190,11 @@ fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
             text = iconPhrase,
             Modifier.padding(top = 16.dp),
             style = TextStyle(
-                fontSize = 42.sp,
+                fontSize = 32.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             ),
-            color =
-            when (iconPhrase) {
+            color = when (iconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
                 }
@@ -191,40 +215,48 @@ fun WeatherStatus(time : String , iconPhrase: String, temperature: Int) {
 
         Text(
             text = "$temperature°",
-            Modifier.padding(top = 14.dp),
+            Modifier.padding(top = 14.dp, bottom = 14.dp),
             style = TextStyle(
-                fontSize = 48.sp,
+                fontSize = 42.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color =
-            when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> { White }
+            color = when (iconPhrase) {
+                "Cloudy", "Rainy", "Lightning" -> {
+                    White
+                }
 
-                "Snowy" -> { DarkBlue }
+                "Snowy" -> {
+                    DarkBlue
+                }
 
-                "Sunny" -> { White }
+                "Sunny" -> {
+                    White
+                }
 
-                else -> { White }
+                else -> {
+                    White
+                }
             }
         )
 
-        WeatherForecastDay(time , iconPhrase , temperature)
+        WeatherForecastDay(data5Day, iconPhrase)
 
-        WeatherForecastHour(time , iconPhrase , temperature)
+        WeatherForecastHour(data12Hour, iconPhrase)
     }
 
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WeatherForecastDay(time : String , iconPhrase: String , temperature: Int) {
+fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
 
     Column {
 
         Text(
             text = "5-day forecast",
-            modifier = Modifier.padding(start = 16.dp , bottom = 4.dp),
+            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
             color = when (iconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
@@ -248,10 +280,10 @@ fun WeatherForecastDay(time : String , iconPhrase: String , temperature: Int) {
         LazyRow(
             contentPadding = PaddingValues(top = 16.dp , bottom = 16.dp , start = 6.dp , end = 4.dp),
             verticalAlignment = Alignment.Bottom
-        ){
+        ) {
 
-            items(5){
-                ForecastDayItem(time , iconPhrase , temperature)
+            items(data.size) {
+                ForecastDayItem(data[it])
             }
 
         }
@@ -259,30 +291,38 @@ fun WeatherForecastDay(time : String , iconPhrase: String , temperature: Int) {
     }
 
 
-
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ForecastDayItem(time: String, iconPhrase: String, temperature: Int) {
+fun ForecastDayItem(data: DailyForecast) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .background(noColor)
-            .padding(end = 10.dp)
+            .padding(end = 12.dp, start = 10.dp)
     ) {
 
+
+        val inputString = data.Date.substring(0, 9)
+
+        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = format.parse(inputString)
+
+        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date)
+
+
         Text(
-            text = time ,
+            text = dayOfWeek,
             style = TextStyle(
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(bottom = 8.dp),
-            color =
-            when (iconPhrase) {
+            color = when (data.Day.IconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
                 }
@@ -302,11 +342,25 @@ fun ForecastDayItem(time: String, iconPhrase: String, temperature: Int) {
         )
 
         AsyncImage(
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier
+                .size(52.dp)
+                .padding(top = 4.dp),
             contentDescription = null,
-            model = when (iconPhrase) {
+            model = when (data.Day.IconPhrase) {
                 "Cloudy" -> {
                     R.drawable.cloudy
+                }
+
+                "Mostly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Partly sunny" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Lightning" -> {
@@ -331,15 +385,17 @@ fun ForecastDayItem(time: String, iconPhrase: String, temperature: Int) {
             }
         )
 
+        val temp = data.Temperature.Minimum.Value
+        val temperature = ((temp - 32) / 1.8).toInt()
+
         Text(
-            text = temperature.toString() + "°",
+            text = "$temperature°",
             style = TextStyle(
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color =
-            when (iconPhrase) {
+            color = when (data.Day.IconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
                 }
@@ -355,7 +411,8 @@ fun ForecastDayItem(time: String, iconPhrase: String, temperature: Int) {
                 else -> {
                     White
                 }
-            }
+            },
+            modifier = Modifier.padding(top = 4.dp)
         )
 
     }
@@ -364,13 +421,13 @@ fun ForecastDayItem(time: String, iconPhrase: String, temperature: Int) {
 
 
 @Composable
-fun WeatherForecastHour(time : String , iconPhrase: String , temperature: Int) {
+fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
 
     Column {
 
         Text(
             text = "12-hour forecast",
-            modifier = Modifier.padding(start = 16.dp , bottom = 4.dp),
+            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp, top = 14.dp),
             color = when (iconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
@@ -394,41 +451,37 @@ fun WeatherForecastHour(time : String , iconPhrase: String , temperature: Int) {
         LazyRow(
             contentPadding = PaddingValues(top = 16.dp , bottom = 16.dp , start = 6.dp , end = 4.dp),
             verticalAlignment = Alignment.Bottom
-        ){
+        ) {
 
-            items(10){
-                ForecastHourItem(time , iconPhrase , temperature)
+            items(data.size) {
+                ForecastHourItem(data[it])
             }
 
         }
 
     }
-
-
-
 }
 
 @Composable
-fun ForecastHourItem(time: String, iconPhrase: String, temperature: Int) {
+fun ForecastHourItem(data: Search12HourForecast) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .background(noColor)
-            .padding(end = 10.dp)
+            .padding(end = 12.dp, start = 10.dp)
     ) {
 
         Text(
-            text = time ,
+            text = data.DateTime.substring(11, 16),
             style = TextStyle(
-                fontSize = 18.sp,
+                fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             ),
-            modifier = Modifier.padding(bottom = 8.dp),
-            color =
-            when (iconPhrase) {
+            modifier = Modifier.padding(end = 12.dp, start = 10.dp),
+            color = when (data.IconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
                 }
@@ -448,11 +501,33 @@ fun ForecastHourItem(time: String, iconPhrase: String, temperature: Int) {
         )
 
         AsyncImage(
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier
+                .size(52.dp)
+                .padding(top = 4.dp),
             contentDescription = null,
-            model = when (iconPhrase) {
+            model = when (data.IconPhrase) {
                 "Cloudy" -> {
                     R.drawable.cloudy
+                }
+
+                "Mostly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Partly sunny" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Partly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Mostly clear" -> {
+                    R.drawable.mostly_sunny
+                }
+
+                "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Lightning" -> {
@@ -477,15 +552,17 @@ fun ForecastHourItem(time: String, iconPhrase: String, temperature: Int) {
             }
         )
 
+        val temp = data.Temperature.Value
+        val temperature = ((temp - 32) / 1.8).toInt()
+
         Text(
-            text = temperature.toString() + "°",
+            text = "$temperature°",
             style = TextStyle(
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color =
-            when (iconPhrase) {
+            color = when (data.IconPhrase) {
                 "Cloudy", "Rainy", "Lightning" -> {
                     White
                 }
@@ -501,7 +578,8 @@ fun ForecastHourItem(time: String, iconPhrase: String, temperature: Int) {
                 else -> {
                     White
                 }
-            }
+            },
+            modifier = Modifier.padding(top = 4.dp)
         )
 
     }

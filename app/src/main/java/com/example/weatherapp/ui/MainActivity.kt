@@ -1,10 +1,12 @@
 package com.example.weatherapp.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,15 +26,11 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private val homeViewModel: HomeViewModel by viewModels()
-//    var data = listOf<DailyForecast>()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        lifecycleScope.launch(coroutineExceptionHandler) {
-//            val data = homeViewModel.search5DayForecast()
-//            Log.v("testApiResponse", data.toString())
-//        }
 
         setContent {
             WeatherAppTheme(darkTheme = false) {
@@ -54,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UiWeatherApp(homeViewModel: HomeViewModel) {
 
