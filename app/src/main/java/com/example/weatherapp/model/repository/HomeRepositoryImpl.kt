@@ -1,6 +1,5 @@
 package com.example.weatherapp.model.repository
 
-import android.util.Log
 import com.example.weatherapp.model.apiService.ApiService
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.model.dataClass.Search12HourForecast
@@ -10,25 +9,17 @@ import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(private val apiService: ApiService) : HomeRepository {
 
-    private var keyCity = ""
 
     override suspend fun searchByGeoPosition(location: String): SearchLocationResponse {
-        val result = apiService.searchByGeoPosition(API_KEY, location)
-        keyCity = result.Key
-        return result
+        return apiService.searchByGeoPosition(API_KEY, location)
     }
 
-    override suspend fun search5DayForecast(): List<DailyForecast> {
-        val result = apiService.get5DayForecast("211331", API_KEY).DailyForecasts
-        return result
+    override suspend fun search5DayForecast(keyCity: String): List<DailyForecast> {
+        return apiService.get5DayForecast(keyCity, API_KEY).DailyForecasts
     }
 
-    override suspend fun search12HourForecast(): List<Search12HourForecast> {
-        val result = apiService.get12HourHourlyForecast("211331" , API_KEY)
-
-        Log.v("DatagetData" , result.toString())
-
-        return result
+    override suspend fun search12HourForecast(keyCity: String): List<Search12HourForecast> {
+        return apiService.get12HourHourlyForecast(keyCity, API_KEY)
     }
 
 

@@ -9,8 +9,8 @@ interface HomeRepository {
 
     suspend fun searchByGeoPosition(location : String) : SearchLocationResponse
 
-    suspend fun search5DayForecast() : List<DailyForecast>
+    suspend fun search5DayForecast(keyCity : String) : List<DailyForecast>
 
-    suspend fun search12HourForecast() : List<Search12HourForecast>
+    suspend fun search12HourForecast(keyCity : String) : List<Search12HourForecast>
 
 }

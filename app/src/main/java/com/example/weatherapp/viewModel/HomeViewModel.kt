@@ -1,6 +1,5 @@
 package com.example.weatherapp.viewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,47 +17,36 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
 
     val city = mutableStateOf("")
-    val search5day = mutableStateOf(listOf<DailyForecast>())
-    val search12hour = mutableStateOf(listOf<Search12HourForecast>())
+    private val search5day = mutableStateOf(listOf<DailyForecast>())
+    private val search12hour = mutableStateOf(listOf<Search12HourForecast>())
+    private val keyCity = mutableStateOf("")
 
 
 
     fun searchByGeoPosition(location: String) {
-
         viewModelScope.launch(coroutineExceptionHandler) {
-
             val result = repository.searchByGeoPosition(location)
-
-            Log.v("resultResponse", result.EnglishName)
             city.value = result.EnglishName
-
+            keyCity.value = result.Key
         }
     }
 
     fun search5DayForecast() : List<DailyForecast> {
-
         viewModelScope.launch(coroutineExceptionHandler) {
-            search5day.value = repository.search5DayForecast()
-            Log.v("testAPiNew" , search5day.value.toString())
+            search5day.value = repository.search5DayForecast(keyCity.value)
         }
 
-        return if (search5day.value.isNotEmpty()){
-            search5day.value
-        }else{
+        return search5day.value.ifEmpty {
             EMPTY_DATA_5Day
         }
-
     }
 
     fun search12HourForecast() : List<Search12HourForecast> {
-
         viewModelScope.launch(coroutineExceptionHandler) {
-            search12hour.value = repository.search12HourForecast()
+            search12hour.value = repository.search12HourForecast(keyCity.value)
         }
 
-        return if (search12hour.value.isNotEmpty()){
-            search12hour.value
-        }else{
+        return search12hour.value.ifEmpty {
             EMPTY_DATA_12HOUR
         }
     }

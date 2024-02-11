@@ -1,7 +1,8 @@
+@file:Suppress("DUPLICATE_LABEL_IN_WHEN")
+
 package com.example.weatherapp.ui.feature
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -21,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -50,8 +53,6 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
     val data5Day = homeViewModel.search5DayForecast()
     val data12Hour = homeViewModel.search12HourForecast()
 
-    Log.v("Dataget", data12Hour.toString())
-
     val iconPhrase = data5Day[0].Day.IconPhrase
     val temp = data5Day[0].Temperature.Minimum.Value
     val temperature = ((temp - 32) / 1.8).toInt()
@@ -65,30 +66,41 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                 brush = Brush.verticalGradient(
                     colors =
                     when (iconPhrase) {
-                        "Cloudy", "Rainy", "Lightning" -> {
-                            listOf<Color>(DarkBlue, DarkBlue)
+                        "Cloudy", "Rainy" -> {
+                            listOf(DarkBlue, DarkBlue)
                         }
 
-                        "Snowy" -> {
-                            listOf<Color>(LightBlue, White)
+                        "Snowy", "Lightning", "Hazy sunshine" -> {
+                            listOf(LightBlue, White)
                         }
 
-                        "Sunny" -> {
-                            listOf<Color>(gradiantBlue1, gradiantBlue2)
+                        "Sunny", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                            listOf(gradiantBlue1, gradiantBlue2)
+                        }
+
+                        "Mostly cloudy" -> {
+                            listOf(DarkBlue, LightBlue)
                         }
 
                         else -> {
-                            listOf<Color>(DarkBlue, DarkBlue)
+                            listOf(DarkBlue, DarkBlue)
                         }
                     }
                 )
             )
     ) {
 
-        HomeScreenToolbar(homeViewModel.city.value, "data[0].Day.IconPhrase")
+
+        HomeScreenToolbar(homeViewModel.city.value, iconPhrase){
+
+
+
+        }
+
+
+
 
         WeatherStatus(data5Day, data12Hour, iconPhrase, temperature)
-
     }
 
 
@@ -96,9 +108,10 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenToolbar(cityName: String, iconPhrase: String) {
+fun HomeScreenToolbar(cityName: String, iconPhrase: String , onClickedGetLocation :() -> Unit) {
 
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(noColor),
         title = {
             Text(
                 text = cityName,
@@ -110,11 +123,13 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String) {
                 ),
                 color =
                 when (iconPhrase) {
-                    "Cloudy", "Rainy", "Lightning" -> { White }
+                    "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                        White
+                    }
 
-                    "Snowy" -> { DarkBlue }
-
-                    "Sunny" -> { White }
+                    "Snowy", "Lightning", "Hazy sunshine" -> {
+                        DarkBlue
+                    }
 
                     else -> {
                         White
@@ -122,9 +137,34 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String) {
                 }
             )
         },
-        colors = TopAppBarDefaults.topAppBarColors(noColor)
-    )
+        actions = {
 
+            IconButton(
+                onClick = { onClickedGetLocation.invoke() },
+                modifier = Modifier.padding(end = 16.dp, top = 16.dp),
+            ) {
+
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_location_pin_24),
+                    contentDescription = null ,
+                    modifier = Modifier.size(30.dp),
+                    tint =  when (iconPhrase) {
+                        "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                            White
+                        }
+
+                        "Snowy", "Lightning", "Hazy sunshine" -> {
+                            DarkBlue
+                        }
+
+                        else -> {
+                            White
+                        }
+                    }
+                )
+            }
+        }
+    )
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -152,6 +192,10 @@ fun WeatherStatus(
                     R.drawable.cloudy
                 }
 
+                "Clear" -> {
+                    R.drawable.moon
+                }
+
                 "Mostly cloudy" -> {
                     R.drawable.sun_cloudy
                 }
@@ -160,7 +204,19 @@ fun WeatherStatus(
                     R.drawable.sun_cloudy
                 }
 
+                "Partly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Mostly clear" -> {
+                    R.drawable.partly_clear
+                }
+
                 "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
+                }
+
+                "Mostly sunny" -> {
                     R.drawable.mostly_sunny
                 }
 
@@ -180,6 +236,14 @@ fun WeatherStatus(
                     R.drawable.rainy
                 }
 
+                "Hazy sunshine" -> {
+                    R.drawable.fog
+                }
+
+                "Hazy moonlight" -> {
+                    R.drawable.partly_clear
+                }
+
                 else -> {
                     White
                 }
@@ -195,16 +259,12 @@ fun WeatherStatus(
                 fontWeight = FontWeight.Light
             ),
             color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -258,16 +318,12 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
             text = "5-day forecast",
             modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
             color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -306,12 +362,12 @@ fun ForecastDayItem(data: DailyForecast) {
     ) {
 
 
-        val inputString = data.Date.substring(0, 9)
+        val inputString = data.Date.substring(0, 10)
 
         val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val date = format.parse(inputString)
 
-        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date)
+        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date!!)
 
 
         Text(
@@ -323,16 +379,12 @@ fun ForecastDayItem(data: DailyForecast) {
             ),
             modifier = Modifier.padding(bottom = 8.dp),
             color = when (data.Day.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -351,6 +403,10 @@ fun ForecastDayItem(data: DailyForecast) {
                     R.drawable.cloudy
                 }
 
+                "Clear" -> {
+                    R.drawable.moon
+                }
+
                 "Mostly cloudy" -> {
                     R.drawable.sun_cloudy
                 }
@@ -359,7 +415,19 @@ fun ForecastDayItem(data: DailyForecast) {
                     R.drawable.sun_cloudy
                 }
 
+                "Partly cloudy" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Mostly clear" -> {
+                    R.drawable.partly_clear
+                }
+
                 "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
+                }
+
+                "Mostly sunny" -> {
                     R.drawable.mostly_sunny
                 }
 
@@ -379,6 +447,14 @@ fun ForecastDayItem(data: DailyForecast) {
                     R.drawable.rainy
                 }
 
+                "Hazy sunshine" -> {
+                    R.drawable.fog
+                }
+
+                "Hazy moonlight" -> {
+                    R.drawable.partly_clear
+                }
+
                 else -> {
                     White
                 }
@@ -396,16 +472,12 @@ fun ForecastDayItem(data: DailyForecast) {
                 fontWeight = FontWeight.Bold
             ),
             color = when (data.Day.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -429,16 +501,12 @@ fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
             text = "12-hour forecast",
             modifier = Modifier.padding(start = 16.dp, bottom = 4.dp, top = 14.dp),
             color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -482,16 +550,12 @@ fun ForecastHourItem(data: Search12HourForecast) {
             ),
             modifier = Modifier.padding(end = 12.dp, start = 10.dp),
             color = when (data.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
@@ -510,6 +574,10 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     R.drawable.cloudy
                 }
 
+                "Clear" -> {
+                    R.drawable.moon
+                }
+
                 "Mostly cloudy" -> {
                     R.drawable.sun_cloudy
                 }
@@ -523,10 +591,14 @@ fun ForecastHourItem(data: Search12HourForecast) {
                 }
 
                 "Mostly clear" -> {
-                    R.drawable.mostly_sunny
+                    R.drawable.partly_clear
                 }
 
                 "Intermittent clouds" -> {
+                    R.drawable.mostly_sunny
+                }
+
+                "Mostly sunny" -> {
                     R.drawable.mostly_sunny
                 }
 
@@ -546,6 +618,14 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     R.drawable.rainy
                 }
 
+                "Hazy sunshine" -> {
+                    R.drawable.fog
+                }
+
+                "Hazy moonlight" -> {
+                    R.drawable.partly_clear
+                }
+
                 else -> {
                     White
                 }
@@ -563,16 +643,12 @@ fun ForecastHourItem(data: Search12HourForecast) {
                 fontWeight = FontWeight.Bold
             ),
             color = when (data.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy" -> {
+                "Snowy", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
-                }
-
-                "Sunny" -> {
-                    White
                 }
 
                 else -> {
