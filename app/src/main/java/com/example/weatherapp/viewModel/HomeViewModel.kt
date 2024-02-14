@@ -1,5 +1,6 @@
 package com.example.weatherapp.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.example.weatherapp.util.EMPTY_DATA_12HOUR
 import com.example.weatherapp.util.EMPTY_DATA_5Day
 import com.example.weatherapp.util.coroutineExceptionHandler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +19,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
 
     val city = mutableStateOf("")
+    val isGettingLocation = mutableStateOf(false)
     private val search5day = mutableStateOf(listOf<DailyForecast>())
     private val search12hour = mutableStateOf(listOf<Search12HourForecast>())
     private val keyCity = mutableStateOf("")
@@ -24,6 +27,9 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
 
 
     fun searchByGeoPosition(location: String) {
+        Log.v("getdatalocation" , location.toString())
+
+
         viewModelScope.launch(coroutineExceptionHandler) {
             val result = repository.searchByGeoPosition(location)
             city.value = result.EnglishName
@@ -51,6 +57,12 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
         }
     }
 
-
+    fun getLocation(){
+        viewModelScope.launch(coroutineExceptionHandler) {
+            isGettingLocation.value = true
+            delay(3000)
+            isGettingLocation.value = false
+        }
+    }
 
 }

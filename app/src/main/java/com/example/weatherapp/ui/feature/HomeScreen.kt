@@ -1,18 +1,27 @@
-@file:Suppress("DUPLICATE_LABEL_IN_WHEN")
-
 package com.example.weatherapp.ui.feature
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,15 +30,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.weatherapp.R
 import com.example.weatherapp.model.dataClass.DailyForecast
@@ -40,25 +52,30 @@ import com.example.weatherapp.ui.theme.White
 import com.example.weatherapp.ui.theme.gradiantBlue1
 import com.example.weatherapp.ui.theme.gradiantBlue2
 import com.example.weatherapp.ui.theme.noColor
+import com.example.weatherapp.util.MyScreens
 import com.example.weatherapp.viewModel.HomeViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(homeViewModel: HomeViewModel) {
+fun HomeScreen(
+    homeViewModel: HomeViewModel,
+    navController: NavHostController,
+    onClickedGetLocation: () -> Unit
+) {
 
-    homeViewModel.searchByGeoPosition("35.6950453,52.0321925")
-
+    //get data from view model
     val data5Day = homeViewModel.search5DayForecast()
     val data12Hour = homeViewModel.search12HourForecast()
 
+    //init variable
     val iconPhrase = data5Day[0].Day.IconPhrase
     val temp = data5Day[0].Temperature.Minimum.Value
     val temperature = ((temp - 32) / 1.8).toInt()
 
 
-
+    //screen
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,7 +87,7 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
                             listOf(DarkBlue, DarkBlue)
                         }
 
-                        "Snowy", "Lightning", "Hazy sunshine" -> {
+                        "Snow", "Lightning", "Hazy sunshine" -> {
                             listOf(LightBlue, White)
                         }
 
@@ -90,25 +107,26 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
             )
     ) {
 
-
-        HomeScreenToolbar(homeViewModel.city.value, iconPhrase){
-
-
-
+        //tool bar
+        HomeScreenToolbar(
+            homeViewModel.city.value,
+            iconPhrase ,
+            homeViewModel.isGettingLocation.value
+        ){
+            onClickedGetLocation.invoke()
+            homeViewModel.getLocation()
         }
 
-
-
-
-        WeatherStatus(data5Day, data12Hour, iconPhrase, temperature)
+        //today status
+        WeatherStatus(data5Day, data12Hour, iconPhrase, temperature){
+            navController.navigate(MyScreens.DetailScreen.route + "/" + it)
+        }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenToolbar(cityName: String, iconPhrase: String , onClickedGetLocation :() -> Unit) {
+fun HomeScreenToolbar(cityName: String, iconPhrase: String, isGettingLocation: Boolean, onClickedGetLocation: () -> Unit) {
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(noColor),
@@ -127,7 +145,7 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String , onClickedGetLocatio
                         White
                     }
 
-                    "Snowy", "Lightning", "Hazy sunshine" -> {
+                    "Snow", "Lightning", "Hazy sunshine" -> {
                         DarkBlue
                     }
 
@@ -144,24 +162,28 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String , onClickedGetLocatio
                 modifier = Modifier.padding(end = 16.dp, top = 16.dp),
             ) {
 
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_location_pin_24),
-                    contentDescription = null ,
-                    modifier = Modifier.size(30.dp),
-                    tint =  when (iconPhrase) {
-                        "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
-                            White
-                        }
+                if (isGettingLocation){
+                    DotsTyping()
+                }else{
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_location_pin_24),
+                        contentDescription = null ,
+                        modifier = Modifier.size(30.dp),
+                        tint =  when (iconPhrase) {
+                            "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                                White
+                            }
 
-                        "Snowy", "Lightning", "Hazy sunshine" -> {
-                            DarkBlue
-                        }
+                            "Snow", "Lightning", "Hazy sunshine" -> {
+                                DarkBlue
+                            }
 
-                        else -> {
-                            White
+                            else -> {
+                                White
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     )
@@ -172,8 +194,8 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String , onClickedGetLocatio
 fun WeatherStatus(
     data5Day: List<DailyForecast>,
     data12Hour: List<Search12HourForecast>,
-    iconPhrase: String,
-    temperature: Int
+    iconPhrase: String, temperature: Int ,
+    onClickedDayItem :(String) -> Unit
 ) {
 
     Column(
@@ -224,7 +246,7 @@ fun WeatherStatus(
                     R.drawable.lightning
                 }
 
-                "Snowy" -> {
+                "Snow" -> {
                     R.drawable.snowy
                 }
 
@@ -263,7 +285,7 @@ fun WeatherStatus(
                     White
                 }
 
-                "Snowy", "Lightning", "Hazy sunshine" -> {
+                "Snow", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
                 }
 
@@ -286,7 +308,7 @@ fun WeatherStatus(
                     White
                 }
 
-                "Snowy" -> {
+                "Snow" -> {
                     DarkBlue
                 }
 
@@ -300,7 +322,7 @@ fun WeatherStatus(
             }
         )
 
-        WeatherForecastDay(data5Day, iconPhrase)
+        WeatherForecastDay(data5Day, iconPhrase , onClickedDayItem)
 
         WeatherForecastHour(data12Hour, iconPhrase)
     }
@@ -308,9 +330,10 @@ fun WeatherStatus(
 
 }
 
+//--------------------------------------------------------------------------------------------------
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
+fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String , onClickedDayItem :(String) -> Unit) {
 
     Column {
 
@@ -322,7 +345,7 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
                     White
                 }
 
-                "Snowy", "Lightning" -> {
+                "Snow", "Lightning" -> {
                     DarkBlue
                 }
 
@@ -339,7 +362,7 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
         ) {
 
             items(data.size) {
-                ForecastDayItem(data[it])
+                ForecastDayItem(data[it] , onClickedDayItem)
             }
 
         }
@@ -351,7 +374,7 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String) {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ForecastDayItem(data: DailyForecast) {
+fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -359,6 +382,7 @@ fun ForecastDayItem(data: DailyForecast) {
         modifier = Modifier
             .background(noColor)
             .padding(end = 12.dp, start = 10.dp)
+            .clickable { onClickedDayItem.invoke(data.EpochDate.toString()) }
     ) {
 
 
@@ -378,12 +402,12 @@ fun ForecastDayItem(data: DailyForecast) {
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(bottom = 8.dp),
-            color = when (data.Day.IconPhrase) {
+            color = when (data.Night.IconPhrase) {
                 "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White
                 }
 
-                "Snowy", "Lightning" -> {
+                "Snow", "Lightning" -> {
                     DarkBlue
                 }
 
@@ -435,7 +459,7 @@ fun ForecastDayItem(data: DailyForecast) {
                     R.drawable.lightning
                 }
 
-                "Snowy" -> {
+                "Snow" -> {
                     R.drawable.snowy
                 }
 
@@ -456,7 +480,7 @@ fun ForecastDayItem(data: DailyForecast) {
                 }
 
                 else -> {
-                    White
+                    R.drawable.suny
                 }
             }
         )
@@ -476,7 +500,7 @@ fun ForecastDayItem(data: DailyForecast) {
                     White
                 }
 
-                "Snowy", "Lightning", "Hazy sunshine" -> {
+                "Snow", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
                 }
 
@@ -491,7 +515,7 @@ fun ForecastDayItem(data: DailyForecast) {
 
 }
 
-
+//--------------------------------------------------------------------------------------------------
 @Composable
 fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
 
@@ -505,7 +529,7 @@ fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
                     White
                 }
 
-                "Snowy", "Lightning", "Hazy sunshine" -> {
+                "Snow", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
                 }
 
@@ -554,7 +578,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     White
                 }
 
-                "Snowy", "Lightning", "Hazy sunshine" -> {
+                "Snow", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
                 }
 
@@ -606,7 +630,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     R.drawable.lightning
                 }
 
-                "Snowy" -> {
+                "Snow" -> {
                     R.drawable.snowy
                 }
 
@@ -647,7 +671,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     White
                 }
 
-                "Snowy", "Lightning", "Hazy sunshine" -> {
+                "Snow", "Lightning", "Hazy sunshine" -> {
                     DarkBlue
                 }
 
@@ -660,4 +684,61 @@ fun ForecastHourItem(data: Search12HourForecast) {
 
     }
 
+}
+
+//--------------------------------------------------------------------------------------------------
+@Composable
+fun DotsTyping() {
+
+    val dotSize = 10.dp
+    val delayUnit = 350
+    val maxOffset = 10f
+
+    @Composable
+    fun Dot(
+        offset: Float
+    ) = Spacer(
+        Modifier
+            .size(dotSize)
+            .offset(y = -offset.dp)
+            .background(
+                color = Color.White,
+                shape = CircleShape
+            )
+            .padding(start = 8.dp, end = 8.dp)
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    @Composable
+    fun animateOffsetWithDelay(delay: Int) = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = delayUnit * 4
+                0f at delay with LinearEasing
+                maxOffset at delay + delayUnit with LinearEasing
+                0f at delay + delayUnit * 2
+            }
+        ), label = ""
+    )
+
+    val offset1 by animateOffsetWithDelay(0)
+    val offset2 by animateOffsetWithDelay(delayUnit)
+    val offset3 by animateOffsetWithDelay(delayUnit * 2)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(top = maxOffset.dp)
+    ) {
+        val spaceSize = 2.dp
+
+        Dot(offset1)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset2)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset3)
+    }
 }
