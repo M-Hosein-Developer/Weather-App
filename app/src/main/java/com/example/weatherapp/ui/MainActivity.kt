@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
     //variable of location permission
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val PERMISSION_ID = 101
-    private var locationAdd : String? = null ?: "35.710228,51.337778"
+    private var locationAdd : String? = null ?: ""
 
 
 
@@ -232,7 +232,7 @@ fun UiWeatherApp(homeViewModel: HomeViewModel, onClickedGetLocation: () -> Unit)
             route = MyScreens.DetailScreen.route + "/" + "{dailyForecast}",
             arguments = listOf(navArgument("dailyForecast"){type = NavType.StringType})
         ){
-            DetailScreen(homeViewModel , it.arguments!!.getString("dailyForecast" , ""))
+            DetailScreen(homeViewModel , it.arguments!!.getString("dailyForecast" , "null"))
         }
 
     }

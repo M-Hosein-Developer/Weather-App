@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -83,7 +84,7 @@ fun HomeScreen(
                 brush = Brush.verticalGradient(
                     colors =
                     when (iconPhrase) {
-                        "Cloudy", "Rainy" -> {
+                        "Cloudy", "Rainy" , "Mostly cloudy w/ showers"-> {
                             listOf(DarkBlue, DarkBlue)
                         }
 
@@ -95,7 +96,7 @@ fun HomeScreen(
                             listOf(gradiantBlue1, gradiantBlue2)
                         }
 
-                        "Mostly cloudy" -> {
+                        "Mostly cloudy" , "Flurries" -> {
                             listOf(DarkBlue, LightBlue)
                         }
 
@@ -141,7 +142,7 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String, isGettingLocation: B
                 ),
                 color =
                 when (iconPhrase) {
-                    "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                    "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" ,"Mostly cloudy w/ showers" -> {
                         White
                     }
 
@@ -170,7 +171,7 @@ fun HomeScreenToolbar(cityName: String, iconPhrase: String, isGettingLocation: B
                         contentDescription = null ,
                         modifier = Modifier.size(30.dp),
                         tint =  when (iconPhrase) {
-                            "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                            "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" , "Mostly cloudy w/ showers"-> {
                                 White
                             }
 
@@ -212,6 +213,10 @@ fun WeatherStatus(
             model = when (data5Day[0].Day.IconPhrase) {
                 "Cloudy" -> {
                     R.drawable.cloudy
+                }
+
+                "Mostly cloudy w/ showers" -> {
+                    R.drawable.sun_cloudy
                 }
 
                 "Clear" -> {
@@ -278,10 +283,11 @@ fun WeatherStatus(
             style = TextStyle(
                 fontSize = 32.sp,
                 fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center
             ),
             color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny" , "Mostly cloudy w/ showers" -> {
                     White
                 }
 

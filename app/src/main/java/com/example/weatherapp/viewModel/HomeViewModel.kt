@@ -1,6 +1,5 @@
 package com.example.weatherapp.viewModel
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,11 +26,8 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
 
 
     fun searchByGeoPosition(location: String) {
-        Log.v("getdatalocation" , location.toString())
-
-
         viewModelScope.launch(coroutineExceptionHandler) {
-            val result = repository.searchByGeoPosition(location)
+            val result = repository.searchByGeoPosition(location ?: "35.710228,51.337778")
             city.value = result.EnglishName
             keyCity.value = result.Key
         }
