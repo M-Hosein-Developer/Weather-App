@@ -22,12 +22,14 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
     private val search5day = mutableStateOf(listOf<DailyForecast>())
     private val search12hour = mutableStateOf(listOf<Search12HourForecast>())
     private val keyCity = mutableStateOf("")
+    private val locationCity = mutableStateOf("35.710228,51.337778")
 
 
 
     fun searchByGeoPosition(location: String) {
         viewModelScope.launch(coroutineExceptionHandler) {
-            val result = repository.searchByGeoPosition(location ?: "35.710228,51.337778")
+            locationCity.value = location
+            val result = repository.searchByGeoPosition(locationCity.value)
             city.value = result.EnglishName
             keyCity.value = result.Key
         }

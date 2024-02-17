@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
     //variable of location permission
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private val PERMISSION_ID = 101
-    private var locationAdd : String? = null ?: ""
+    private var locationAdd = "35.710228,51.337778"
 
 
 
@@ -59,6 +59,10 @@ class MainActivity : ComponentActivity() {
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        //get and set location
+        getLastLocation()
+        homeViewModel.searchByGeoPosition(locationAdd)
 
 
         setContent {
@@ -70,8 +74,8 @@ class MainActivity : ComponentActivity() {
 
                     UiWeatherApp(homeViewModel){
                         getLastLocation()
-                        homeViewModel.searchByGeoPosition(locationAdd!!)
-                        Log.v("testLocation" , locationAdd!!)
+                        homeViewModel.searchByGeoPosition(locationAdd)
+                        Log.v("testLocation" , locationAdd)
                     }
 
                 }
@@ -201,15 +205,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-        if (checkPermissions()) {
-            getLastLocation()
-        }
-    }
-
-
 }
 
 @SuppressLint("NewApi")

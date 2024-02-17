@@ -14,17 +14,99 @@ const val API_KEY = "sTJAm3Rc2CQ0C4PO9c7el87oDCu0bl33"
 val EMPTY_DATA_5Day = listOf(
 
     DailyForecast(
-        "2024-02-09T07:00:00+03:30",
-        Day1(false, -1, "Mostly cloudy"),
-        12121333,
+        "2024-02-10T07:00:00+03:30",
+        Day1(false, -1, "Snow"),
+        1212133,
         "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-11T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        142121333,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-12T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        121213433,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-13T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        124121333,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-15T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        121213433,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-16T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        121421333,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("", -1, 0.0), Minimum1("", -1, 0.0))
+    ),
+
+    DailyForecast(
+        "2024-02-17T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        121241333,
         "",
         Night1(false, -1, ""),
         listOf(""),
         Temperature1(Maximum1("" , -1 , 0.0) , Minimum1("" , -1 , 0.0))
-    )
+    ),
 
-)
+
+    DailyForecast(
+        "2024-02-18T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        12121433,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("" , -1 , 0.0) , Minimum1("" , -1 , 0.0))
+    ),
+
+
+    DailyForecast(
+        "2024-02-19T07:00:00+03:30",
+        Day1(false, -1, "Mostly cloudy"),
+        121214333,
+        "",
+        Night1(false, -1, ""),
+        listOf(""),
+        Temperature1(Maximum1("" , -1 , 0.0) , Minimum1("" , -1 , 0.0))
+    ),
+
+
+    )
 
 val EMPTY_DATA_12HOUR = listOf<Search12HourForecast>(
 

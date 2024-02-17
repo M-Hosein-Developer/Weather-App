@@ -17,3 +17,5 @@ val gradiantBlue1 = Color(0xFF2F5AF4)
 val gradiantBlue2 = Color(0xFF0FA2AB)
 val fontColor = Color(0xFF737A83)
 val noColor = Color(0x00737A83)
+
+val backgroundItem = Color(0x4F16CDD8)

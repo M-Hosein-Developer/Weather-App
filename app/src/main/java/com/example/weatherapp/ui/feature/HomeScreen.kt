@@ -72,7 +72,7 @@ fun HomeScreen(
 
     //init variable
     val iconPhrase = data5Day[0].Day.IconPhrase
-    val temp = data5Day[0].Temperature.Minimum.Value
+    val temp = data5Day[0].Temperature.Maximum.Value
     val temperature = ((temp - 32) / 1.8).toInt()
 
 
@@ -84,7 +84,7 @@ fun HomeScreen(
                 brush = Brush.verticalGradient(
                     colors =
                     when (iconPhrase) {
-                        "Cloudy", "Rainy" , "Mostly cloudy w/ showers"-> {
+                        "Cloudy", "Rainy" -> {
                             listOf(DarkBlue, DarkBlue)
                         }
 
@@ -92,11 +92,11 @@ fun HomeScreen(
                             listOf(LightBlue, White)
                         }
 
-                        "Sunny", "Mostly clear", "Intermittent clouds", "Mostly sunny" -> {
+                        "Sunny", "Mostly clear", "Intermittent clouds", "Mostly sunny" , "Partly sunny" , "Partly sunny w/ showers"-> {
                             listOf(gradiantBlue1, gradiantBlue2)
                         }
 
-                        "Mostly cloudy" , "Flurries" -> {
+                        "Mostly cloudy" , "Flurries" , "Mostly cloudy w/ showers"-> {
                             listOf(DarkBlue, LightBlue)
                         }
 
@@ -215,8 +215,16 @@ fun WeatherStatus(
                     R.drawable.cloudy
                 }
 
+                "Partly sunny w/ showers" -> {
+                    R.drawable.sun_cloudy
+                }
+
                 "Mostly cloudy w/ showers" -> {
                     R.drawable.sun_cloudy
+                }
+
+                "Partly cloudy w/ showers" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Clear" -> {
@@ -413,12 +421,12 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                     White
                 }
 
-                "Snow", "Lightning" -> {
+                "Snow" -> {
                     DarkBlue
                 }
 
                 else -> {
-                    White
+                    DarkBlue
                 }
             }
         )
@@ -433,12 +441,24 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                     R.drawable.cloudy
                 }
 
+                "Mostly cloudy w/ showers" -> {
+                    R.drawable.mostly_sunny
+                }
+
                 "Clear" -> {
                     R.drawable.moon
                 }
 
+                "Partly sunny w/ showers" -> {
+                    R.drawable.sun_cloudy
+                }
+
                 "Mostly cloudy" -> {
                     R.drawable.sun_cloudy
+                }
+
+                "Partly cloudy w/ showers" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Partly sunny" -> {
@@ -473,7 +493,11 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                     R.drawable.suny
                 }
 
-                "Rainy" -> {
+                "Rain" -> {
+                    R.drawable.rainy
+                }
+
+                "Showers" -> {
                     R.drawable.rainy
                 }
 
@@ -491,7 +515,7 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
             }
         )
 
-        val temp = data.Temperature.Minimum.Value
+        val temp = data.Temperature.Maximum.Value
         val temperature = ((temp - 32) / 1.8).toInt()
 
         Text(
@@ -506,7 +530,7 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                     White
                 }
 
-                "Snow", "Lightning", "Hazy sunshine" -> {
+                "Snow" -> {
                     DarkBlue
                 }
 
@@ -584,7 +608,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     White
                 }
 
-                "Snow", "Lightning", "Hazy sunshine" -> {
+                "Snow"-> {
                     DarkBlue
                 }
 
@@ -612,6 +636,14 @@ fun ForecastHourItem(data: Search12HourForecast) {
                     R.drawable.sun_cloudy
                 }
 
+                "Partly sunny w/ showers" -> {
+                    R.drawable.sun_cloudy
+                }
+
+                "Mostly cloudy w/ showers" -> {
+                    R.drawable.mostly_sunny
+                }
+
                 "Partly sunny" -> {
                     R.drawable.sun_cloudy
                 }
@@ -622,6 +654,10 @@ fun ForecastHourItem(data: Search12HourForecast) {
 
                 "Mostly clear" -> {
                     R.drawable.partly_clear
+                }
+
+                "Partly cloudy w/ showers" -> {
+                    R.drawable.mostly_sunny
                 }
 
                 "Intermittent clouds" -> {

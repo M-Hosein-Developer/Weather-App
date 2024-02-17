@@ -1,9 +1,5 @@
 package com.example.weatherapp.model.dataClass
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import java.io.Serializable
-
 data class Search5DayForecast(
     val DailyForecasts: List<DailyForecast>,
     val Headline: Headline1
@@ -13,7 +9,6 @@ data class DailyForecast(
     val Date: String,
     val Day: Day1,
     val EpochDate: Int,
-    val Link: String,
     val MobileLink: String,
     val Night: Night1,
     val Sources: List<String>,
