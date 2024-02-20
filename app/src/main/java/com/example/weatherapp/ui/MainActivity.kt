@@ -29,9 +29,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.weatherapp.ui.feature.DetailScreen
 import com.example.weatherapp.ui.feature.HomeScreen
+import com.example.weatherapp.ui.feature.SearchScreen
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.util.MyScreens
-import com.example.weatherapp.viewModel.HomeViewModel
+import com.example.weatherapp.viewModel.MainViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -44,7 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     //init view model
-    private val homeViewModel: HomeViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
 
     //variable of location permission
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
         //get and set location
         getLastLocation()
-        homeViewModel.searchByGeoPosition(locationAdd)
+        mainViewModel.searchByGeoPosition(locationAdd)
 
 
         setContent {
@@ -72,9 +73,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    UiWeatherApp(homeViewModel){
+                    UiWeatherApp(mainViewModel){
                         getLastLocation()
-                        homeViewModel.searchByGeoPosition(locationAdd)
+                        mainViewModel.searchByGeoPosition(locationAdd)
                         Log.v("testLocation" , locationAdd)
                     }
 
@@ -210,7 +211,7 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("NewApi")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun UiWeatherApp(homeViewModel: HomeViewModel, onClickedGetLocation: () -> Unit) {
+fun UiWeatherApp(mainViewModel: MainViewModel, onClickedGetLocation: () -> Unit) {
 
 
     val navController = rememberNavController()
@@ -219,15 +220,22 @@ fun UiWeatherApp(homeViewModel: HomeViewModel, onClickedGetLocation: () -> Unit)
         startDestination = MyScreens.HomeScreen.route,
     ){
 
-        composable(MyScreens.HomeScreen.route){
-            HomeScreen(homeViewModel , navController){ onClickedGetLocation.invoke() }
+        composable(MyScreens.HomeScreen.route) {
+            HomeScreen(mainViewModel, navController) { onClickedGetLocation.invoke() }
         }
 
         composable(
             route = MyScreens.DetailScreen.route + "/" + "{dailyForecast}",
-            arguments = listOf(navArgument("dailyForecast"){type = NavType.StringType})
-        ){
-            DetailScreen(homeViewModel , it.arguments!!.getString("dailyForecast" , "null"))
+            arguments = listOf(navArgument("dailyForecast") { type = NavType.StringType })
+        ) {
+            DetailScreen(mainViewModel, it.arguments!!.getString("dailyForecast", "null"))
+        }
+
+        composable(
+            route = MyScreens.SearchScreen.route + "/" + "{SearchForecast}",
+            arguments = listOf(navArgument("SearchForecast") { type = NavType.StringType })
+        ) {
+            SearchScreen(mainViewModel, it.arguments!!.getString("SearchForecast", "null"))
         }
 
     }

@@ -9,7 +9,7 @@ import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.model.dataClass.Temperature1
 
 const val BASE_URL = "http://dataservice.accuweather.com/"
-const val API_KEY = "sTJAm3Rc2CQ0C4PO9c7el87oDCu0bl33"
+const val API_KEY = "WFZewOIEbegsXKKQgbm8vofKqHNCNpju"
 
 val EMPTY_DATA_5Day = listOf(
 
@@ -108,7 +108,7 @@ val EMPTY_DATA_5Day = listOf(
 
     )
 
-val EMPTY_DATA_12HOUR = listOf<Search12HourForecast>(
+val EMPTY_DATA_12HOUR = listOf(
 
     Search12HourForecast(
         "2024-02-09T07:00:00+03:30",

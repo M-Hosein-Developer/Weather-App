@@ -44,15 +44,15 @@ import com.example.weatherapp.ui.theme.backgroundItem
 import com.example.weatherapp.ui.theme.gradiantBlue1
 import com.example.weatherapp.ui.theme.gradiantBlue2
 import com.example.weatherapp.ui.theme.noColor
-import com.example.weatherapp.viewModel.HomeViewModel
+import com.example.weatherapp.viewModel.MainViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun DetailScreen(homeViewModel: HomeViewModel, date: String) {
+fun DetailScreen(mainViewModel: MainViewModel, date: String) {
 
-    val data = homeViewModel.search5DayForecast()
+    val data = mainViewModel.search5DayForecast()
 
     data.forEach {
 
@@ -425,17 +425,15 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
         LazyRow(
             state = stateRowY,
             contentPadding = PaddingValues(top = 16.dp,  start = 6.dp, end = 4.dp),
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.Bottom,
         ) {
 
-            items(data.size) {
+            items(data.size , key = { it }) {
                 DailyForecastDayItem(data[it], onceData)
             }
 
         }
 
-
-//        Spacer(modifier = Modifier.height(20.dp))
 
         LazyRow(
             state = stateRowX,
@@ -443,7 +441,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
             verticalAlignment = Alignment.Bottom
         ) {
 
-            items(data.size) {
+            items(data.size , key = { it }) {
                 DailyForecastNightItem(data[it], onceData)
             }
 
@@ -453,7 +451,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
 
         Text(
             text = "Night",
-            modifier = Modifier.padding(start = 18.dp, top = 4.dp),
+            modifier = Modifier.padding(start = 18.dp, top = 4.dp , bottom = 18.dp),
             color = when (iconPhrase) {
                 "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
                     White

@@ -5,7 +5,6 @@ import com.example.weatherapp.model.dataClass.Search5DayForecast
 import com.example.weatherapp.model.dataClass.SearchLocationResponse
 import com.example.weatherapp.model.dataClass.SearchResponse
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -23,4 +22,7 @@ interface ApiService {
     @GET("forecasts/v1/hourly/12hour/{locationKey}")
     suspend fun get12HourHourlyForecast(@Path("locationKey") locationKey: String, @Query("apikey") apiKey: String) : List<Search12HourForecast>
 
+    //Search by name
+    @GET("locations/v1/cities/search")
+    suspend fun searchCities( @Query("q") query: String, @Query("apikey") apiKey: String) : SearchResponse
 }

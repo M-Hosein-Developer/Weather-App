@@ -4,6 +4,7 @@ import com.example.weatherapp.model.apiService.ApiService
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.model.dataClass.SearchLocationResponse
+import com.example.weatherapp.model.dataClass.SearchResponse
 import com.example.weatherapp.util.API_KEY
 import javax.inject.Inject
 
@@ -20,6 +21,10 @@ class HomeRepositoryImpl @Inject constructor(private val apiService: ApiService)
 
     override suspend fun search12HourForecast(keyCity: String): List<Search12HourForecast> {
         return apiService.get12HourHourlyForecast(keyCity, API_KEY)
+    }
+
+    override suspend fun searchByName(name: String): SearchResponse {
+        return apiService.searchCities(name ,  API_KEY)
     }
 
 

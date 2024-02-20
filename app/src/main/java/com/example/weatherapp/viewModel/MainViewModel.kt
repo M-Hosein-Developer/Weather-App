@@ -1,5 +1,6 @@
 package com.example.weatherapp.viewModel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,8 +16,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
+class MainViewModel @Inject constructor(private val repository: HomeRepository) : ViewModel() {
 
+    //home screen state
     val city = mutableStateOf("")
     val isGettingLocation = mutableStateOf(false)
     private val search5day = mutableStateOf(listOf<DailyForecast>())
@@ -24,8 +26,11 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
     private val keyCity = mutableStateOf("")
     private val locationCity = mutableStateOf("35.710228,51.337778")
 
+    //Search
+    val search = mutableStateOf("")
 
 
+    //get forecast with location
     fun searchByGeoPosition(location: String) {
         viewModelScope.launch(coroutineExceptionHandler) {
             locationCity.value = location
@@ -35,7 +40,8 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
         }
     }
 
-    fun search5DayForecast() : List<DailyForecast> {
+    //5 day forecast
+    fun search5DayForecast(): List<DailyForecast> {
         viewModelScope.launch(coroutineExceptionHandler) {
             search5day.value = repository.search5DayForecast(keyCity.value)
         }
@@ -45,7 +51,8 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
         }
     }
 
-    fun search12HourForecast() : List<Search12HourForecast> {
+    //12 hour forecast
+    fun search12HourForecast(): List<Search12HourForecast> {
         viewModelScope.launch(coroutineExceptionHandler) {
             search12hour.value = repository.search12HourForecast(keyCity.value)
         }
@@ -55,12 +62,25 @@ class HomeViewModel @Inject constructor(private val repository: HomeRepository) 
         }
     }
 
-    fun getLocation(){
+    //dot - ui get location
+    fun getLocation() {
         viewModelScope.launch(coroutineExceptionHandler) {
             isGettingLocation.value = true
             delay(3000)
             isGettingLocation.value = false
         }
+    }
+
+    //Search by name
+    fun getDataFromSearch() {
+
+        viewModelScope.launch(coroutineExceptionHandler) {
+            Log.v("searchResult", search.value)
+            val result = repository.searchByName(search.value)
+            Log.v("searchResult", result[0].Key)
+            keyCity.value = result[0].Key
+        }
+
     }
 
 }
