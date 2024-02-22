@@ -6,9 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,6 +39,7 @@ import com.example.weatherapp.ui.theme.backgroundItem
 import com.example.weatherapp.util.MyScreens
 import com.example.weatherapp.util.backgroundColor
 import com.example.weatherapp.util.convertFarenToCele
+import com.example.weatherapp.util.dateToDay
 import com.example.weatherapp.util.imageDayStatus
 import com.example.weatherapp.util.textColorWithIcon
 import com.example.weatherapp.viewModel.MainViewModel
@@ -48,7 +49,6 @@ fun SearchScreen(mainViewModel: MainViewModel, navController: NavHostController,
 
     //ViewModel data
     val dailyResult =  mainViewModel.search5DayForecast()
-
 
     //Main Screen
     Column(
@@ -60,7 +60,6 @@ fun SearchScreen(mainViewModel: MainViewModel, navController: NavHostController,
                 )
             )
     ) {
-
 
         SearchBox(
             edtValue = mainViewModel.search.value,
@@ -106,7 +105,7 @@ fun SearchBox(edtValue: String, icon: ImageVector, hint: String, iconPhrase: Str
 @Composable
 fun SearchResult(dailyResult: List<DailyForecast>, mainViewModel: MainViewModel , onClickedItem :(String) -> Unit) {
     LazyColumn {
-        items(1) {
+        items(dailyResult.size) {
             SearchResultItem(dailyResult[it] , mainViewModel , onClickedItem)
             Log.v("testSearch" , dailyResult[it].EpochDate.toString())
         }
@@ -116,21 +115,23 @@ fun SearchResult(dailyResult: List<DailyForecast>, mainViewModel: MainViewModel 
 @Composable
 fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel , onClickedItem :(String) -> Unit) {
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()
+            .height(240.dp)
             .padding(horizontal = 16.dp)
-            .padding(top = 12.dp)
+            .padding(top = 12.dp ,  bottom = 12.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundItem)
             .clickable { onClickedItem.invoke(dailyForecast.EpochDate.toString()) },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AsyncImage(
-            modifier = Modifier.size(80.dp).padding(8.dp).padding(start = 12.dp),
+            modifier = Modifier
+                .size(110.dp)
+                .padding(8.dp)
+                .padding(top = 12.dp),
             model = imageDayStatus(dailyForecast.Day.IconPhrase),
             contentDescription = null
         )
@@ -143,13 +144,14 @@ fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel 
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             ),
-            color = textColorWithIcon(dailyForecast.Day.IconPhrase)
+            color = textColorWithIcon(dailyForecast.Day.IconPhrase),
+            modifier = Modifier.padding(top = 18.dp , bottom = 18.dp)
         )
 
-        Column(
-            verticalArrangement = Arrangement.SpaceEvenly ,
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier.padding(start = 24.dp , end = 18.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
             Text(
@@ -164,10 +166,20 @@ fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel 
             )
 
             Text(
-                text = convertFarenToCele(dailyForecast.Temperature.Minimum.Value),
-                Modifier.padding(top = 12.dp),
+                text = dateToDay(dailyForecast.Date),
                 style = TextStyle(
-                    fontSize = 14.sp,
+                    fontSize = 18.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                ),
+                color = textColorWithIcon(dailyForecast.Day.IconPhrase)
+            )
+
+            Text(
+                text = convertFarenToCele(dailyForecast.Temperature.Minimum.Value),
+                style = TextStyle(
+                    fontSize = 18.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Light,
                     textAlign = TextAlign.Center
