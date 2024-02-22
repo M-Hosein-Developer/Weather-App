@@ -235,7 +235,7 @@ fun UiWeatherApp(mainViewModel: MainViewModel, onClickedGetLocation: () -> Unit)
             route = MyScreens.SearchScreen.route + "/" + "{SearchForecast}",
             arguments = listOf(navArgument("SearchForecast") { type = NavType.StringType })
         ) {
-            SearchScreen(mainViewModel, it.arguments!!.getString("SearchForecast", "null"))
+            SearchScreen(mainViewModel , navController , it.arguments!!.getString("SearchForecast", "null"))
         }
 
     }

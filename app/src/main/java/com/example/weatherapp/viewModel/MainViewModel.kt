@@ -28,6 +28,7 @@ class MainViewModel @Inject constructor(private val repository: HomeRepository) 
 
     //Search
     val search = mutableStateOf("")
+    val cityName = mutableStateOf("")
 
 
     //get forecast with location
@@ -77,6 +78,7 @@ class MainViewModel @Inject constructor(private val repository: HomeRepository) 
         viewModelScope.launch(coroutineExceptionHandler) {
             Log.v("searchResult", search.value)
             val result = repository.searchByName(search.value)
+            cityName.value = result[0].EnglishName
             Log.v("searchResult", result[0].Key)
             keyCity.value = result[0].Key
         }

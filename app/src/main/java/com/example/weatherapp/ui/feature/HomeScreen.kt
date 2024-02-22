@@ -51,11 +51,11 @@ import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.ui.theme.noColor
 import com.example.weatherapp.util.MyScreens
 import com.example.weatherapp.util.backgroundColor
+import com.example.weatherapp.util.convertFarenToCele
+import com.example.weatherapp.util.dateToDay
 import com.example.weatherapp.util.imageDayStatus
 import com.example.weatherapp.util.textColorWithIcon
 import com.example.weatherapp.viewModel.MainViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -163,7 +163,6 @@ fun HomeScreenToolbar(
                     )
                 }
             }
-
         }
     )
 }
@@ -218,8 +217,6 @@ fun WeatherStatus(
 
         WeatherForecastHour(data12Hour, iconPhrase)
     }
-
-
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -249,8 +246,6 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String , onClicked
         }
 
     }
-
-
 }
 
 
@@ -266,17 +261,8 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
             .clickable { onClickedDayItem.invoke(data.EpochDate.toString()) }
     ) {
 
-
-        val inputString = data.Date.substring(0, 10)
-
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val date = format.parse(inputString)
-
-        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date!!)
-
-
         Text(
-            text = dayOfWeek,
+            text = dateToDay(data.Date),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
@@ -294,11 +280,9 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
             model = imageDayStatus(data.Day.IconPhrase)
         )
 
-        val temp = data.Temperature.Maximum.Value
-        val temperature = ((temp - 32) / 1.8).toInt()
 
         Text(
-            text = "$temperature°",
+            text = convertFarenToCele(data.Temperature.Maximum.Value),
             style = TextStyle(
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
@@ -371,11 +355,8 @@ fun ForecastHourItem(data: Search12HourForecast) {
             model = imageDayStatus(data.IconPhrase)
         )
 
-        val temp = data.Temperature.Value
-        val temperature = ((temp - 32) / 1.8).toInt()
-
         Text(
-            text = "$temperature°",
+            text = convertFarenToCele(data.Temperature.Value),
             style = TextStyle(
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,

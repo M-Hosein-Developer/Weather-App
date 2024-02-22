@@ -9,6 +9,8 @@ import com.example.weatherapp.ui.theme.White
 import com.example.weatherapp.ui.theme.gradiantBlue1
 import com.example.weatherapp.ui.theme.gradiantBlue2
 import kotlinx.coroutines.CoroutineExceptionHandler
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
     Log.v("error" , "Error -> " + throwable.message)
@@ -40,7 +42,7 @@ fun backgroundColor(icon : String) : List<Color>{
             listOf(gradiantBlue1, gradiantBlue2)
         }
 
-        "Mostly cloudy", "Flurries", "Cloudy", "Rain", "Mostly cloudy w/ showers" -> {
+        "Mostly cloudy", "Flurries", "Cloudy", "Rain", "Mostly cloudy w/ showers" , "Rain and snow" -> {
             listOf(DarkBlue, LightBlue)
         }
 
@@ -54,6 +56,10 @@ fun imageDayStatus(icon : String) : Int{
     return when (icon) {
         "Cloudy" -> {
             R.drawable.cloudy
+        }
+
+        "Rain and snow" -> {
+            R.drawable.rain_snow
         }
 
         "Partly sunny w/ showers" -> {
@@ -124,4 +130,16 @@ fun imageDayStatus(icon : String) : Int{
             R.drawable.background1
         }
     }
+}
+
+fun dateToDay(date: String): String {
+    val inputString = date.substring(0, 10)
+    val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val date1 = format.parse(inputString)
+    return SimpleDateFormat("EEEE", Locale.getDefault()).format(date1!!)
+}
+
+fun convertFarenToCele(temp : Double) : String{
+    val result = ((temp - 32) / 1.8).toInt()
+    return "$result°"
 }
