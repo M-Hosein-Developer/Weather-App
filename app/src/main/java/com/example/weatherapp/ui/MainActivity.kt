@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,9 +30,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.weatherapp.ui.feature.DetailScreen
 import com.example.weatherapp.ui.feature.HomeScreen
+import com.example.weatherapp.ui.feature.NoInternetScreen
 import com.example.weatherapp.ui.feature.SearchScreen
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.example.weatherapp.util.MyScreens
+import com.example.weatherapp.util.NetworkChecker
 import com.example.weatherapp.viewModel.MainViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -41,6 +44,7 @@ import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 
 
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -49,10 +53,8 @@ class MainActivity : ComponentActivity() {
 
     //variable of location permission
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
-    private val PERMISSION_ID = 101
+    private val permissionId = 101
     private var locationAdd = "35.710228,51.337778"
-
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,13 +98,6 @@ class MainActivity : ComponentActivity() {
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
                     return
                 }
                 mFusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
@@ -141,13 +136,6 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return
         }
         mFusedLocationClient.requestLocationUpdates(
@@ -184,7 +172,7 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ),
-            PERMISSION_ID
+            permissionId
         )
     }
 
@@ -199,7 +187,7 @@ class MainActivity : ComponentActivity() {
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_ID) {
+        if (requestCode == permissionId) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 getLastLocation()
@@ -209,11 +197,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @SuppressLint("NewApi")
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UiWeatherApp(mainViewModel: MainViewModel, onClickedGetLocation: () -> Unit) {
 
+    val context = LocalContext.current
 
+    //Navigation compose
     val navController = rememberNavController()
     NavHost(
         navController = navController,
@@ -221,7 +210,11 @@ fun UiWeatherApp(mainViewModel: MainViewModel, onClickedGetLocation: () -> Unit)
     ){
 
         composable(MyScreens.HomeScreen.route) {
-            HomeScreen(mainViewModel, navController) { onClickedGetLocation.invoke() }
+            if (NetworkChecker(context).internetConnection){
+                HomeScreen(mainViewModel, navController) { onClickedGetLocation.invoke() }
+            }else{
+                NoInternetScreen()
+            }
         }
 
         composable(
