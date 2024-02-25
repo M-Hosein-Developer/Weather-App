@@ -240,7 +240,7 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String , onClicked
         ) {
 
             items(data.size) {
-                ForecastDayItem(data[it] , onClickedDayItem)
+                ForecastDayItem(data[it] , iconPhrase , onClickedDayItem)
             }
 
         }
@@ -250,7 +250,7 @@ fun WeatherForecastDay(data: List<DailyForecast>, iconPhrase: String , onClicked
 
 
 @Composable
-fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
+fun ForecastDayItem(data: DailyForecast , iconPhrase: String , onClickedDayItem :(String) -> Unit) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -269,7 +269,7 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(bottom = 8.dp),
-            color = textColorWithIcon(data.Day.IconPhrase)
+            color = textColorWithIcon(iconPhrase)
         )
 
         AsyncImage(
@@ -288,7 +288,7 @@ fun ForecastDayItem(data: DailyForecast , onClickedDayItem :(String) -> Unit) {
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color = textColorWithIcon(data.Day.IconPhrase),
+            color = textColorWithIcon(iconPhrase),
             modifier = Modifier.padding(top = 4.dp)
         )
 
@@ -317,7 +317,7 @@ fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
         ) {
 
             items(data.size) {
-                ForecastHourItem(data[it])
+                ForecastHourItem(data[it] , iconPhrase)
             }
 
         }
@@ -326,7 +326,7 @@ fun WeatherForecastHour(data: List<Search12HourForecast>, iconPhrase: String) {
 }
 
 @Composable
-fun ForecastHourItem(data: Search12HourForecast) {
+fun ForecastHourItem(data: Search12HourForecast, iconPhrase: String) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -344,7 +344,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(end = 12.dp, start = 10.dp),
-            color = textColorWithIcon(data.IconPhrase)
+            color = textColorWithIcon(iconPhrase)
         )
 
         AsyncImage(
@@ -362,7 +362,7 @@ fun ForecastHourItem(data: Search12HourForecast) {
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color = textColorWithIcon(data.IconPhrase),
+            color = textColorWithIcon(iconPhrase),
             modifier = Modifier.padding(top = 4.dp)
         )
 

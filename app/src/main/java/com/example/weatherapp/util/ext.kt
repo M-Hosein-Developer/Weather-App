@@ -18,7 +18,7 @@ val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
 
 fun textColorWithIcon(icon : String) : Color{
     return when (icon) {
-        "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Mostly cloudy w/ showers" -> {
+        "Cloudy", "Rainy", "Lightning", "Flurries" , "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Mostly cloudy w/ showers" -> {
             White
         }
 
@@ -56,6 +56,10 @@ fun imageDayStatus(icon : String) : Int{
     return when (icon) {
         "Cloudy" -> {
             R.drawable.cloudy
+        }
+
+        "Flurries" -> {
+            R.drawable.tyfoon
         }
 
         "Rain and snow" -> {

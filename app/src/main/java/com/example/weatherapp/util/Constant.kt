@@ -9,7 +9,7 @@ import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.model.dataClass.Temperature1
 
 const val BASE_URL = "http://dataservice.accuweather.com/"
-const val API_KEY = "sTJAm3Rc2CQ0C4PO9c7el87oDCu0bl33"
+const val API_KEY = "o2mRpP8Wf4ssoBmaSIeZh2AwRUVdBzak"
 
 val EMPTY_DATA_5Day = listOf(
 

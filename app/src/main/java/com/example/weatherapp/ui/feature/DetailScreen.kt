@@ -35,19 +35,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.weatherapp.R
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.ui.theme.DarkBlue
-import com.example.weatherapp.ui.theme.LightBlue
 import com.example.weatherapp.ui.theme.White
 import com.example.weatherapp.ui.theme.backgroundItem
-import com.example.weatherapp.ui.theme.gradiantBlue1
-import com.example.weatherapp.ui.theme.gradiantBlue2
 import com.example.weatherapp.ui.theme.noColor
+import com.example.weatherapp.util.backgroundColor
+import com.example.weatherapp.util.convertFarenToCele
+import com.example.weatherapp.util.dateToDay
+import com.example.weatherapp.util.imageDayStatus
+import com.example.weatherapp.util.textColorWithIcon
 import com.example.weatherapp.viewModel.MainViewModel
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun DetailScreen(mainViewModel: MainViewModel, date: String) {
@@ -56,6 +55,7 @@ fun DetailScreen(mainViewModel: MainViewModel, date: String) {
 
     data.forEach {
 
+        val iconPhrase = it.Day.IconPhrase
 
         if (date == it.EpochDate.toString()) {
 
@@ -65,40 +65,17 @@ fun DetailScreen(mainViewModel: MainViewModel, date: String) {
                     .verticalScroll(rememberScrollState())
                     .background(
                         brush = Brush.verticalGradient(
-                            colors =
-                            when (it.Day.IconPhrase) {
-                                "Snow", "Lightning", "Hazy sunshine" -> {
-                                    listOf(LightBlue, White)
-                                }
-
-                                "Sunny", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Showers", "Partly sunny" -> {
-                                    listOf(gradiantBlue1, gradiantBlue2)
-                                }
-
-                                "Mostly cloudy", "Flurries", "Cloudy", "Rain", "Mostly cloudy w/ showers" -> {
-                                    listOf(DarkBlue, LightBlue)
-                                }
-
-                                else -> {
-                                    listOf(DarkBlue, DarkBlue)
-                                }
-                            }
+                            colors = backgroundColor(iconPhrase)
                         )
                     )
             ) {
 
-
-                val inputString = it.Date.substring(0, 10)
-                val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val date1 = format.parse(inputString)
-                val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date1!!)
-
                 DetailScreenToolbar(
-                    dayOfWeek,
+                    dateToDay(it.Date),
                     it.Day.IconPhrase,
                 )
 
-                DailyStatus(it, data)
+                DailyStatus(it, data , iconPhrase)
 
             }
 
@@ -143,83 +120,19 @@ fun DetailScreenToolbar(cityName: String, iconPhrase: String) {
 }
 
 @Composable
-fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
+fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>, iconPhrase: String) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 32.dp, bottom = 0.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 24.dp, bottom = 0.dp, start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AsyncImage(
             modifier = Modifier.size(130.dp),
             contentDescription = null,
-            model = when (onceData.Day.IconPhrase) {
-                "Cloudy" -> {
-                    R.drawable.cloudy
-                }
-
-                "Mostly cloudy w/ showers" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Clear" -> {
-                    R.drawable.moon
-                }
-
-                "Mostly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly sunny" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Mostly clear" -> {
-                    R.drawable.partly_clear
-                }
-
-                "Intermittent clouds" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Mostly sunny" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Lightning" -> {
-                    R.drawable.lightning
-                }
-
-                "Snow" -> {
-                    R.drawable.snowy
-                }
-
-                "Sunny" -> {
-                    R.drawable.suny
-                }
-
-                "Rain" -> {
-                    R.drawable.rainy
-                }
-
-                "Hazy sunshine" -> {
-                    R.drawable.fog
-                }
-
-                "Hazy moonlight" -> {
-                    R.drawable.partly_clear
-                }
-
-                else -> {
-                    White
-                }
-            }
+            model = imageDayStatus(onceData.Day.IconPhrase)
         )
 
         Text(
@@ -231,19 +144,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
                 fontWeight = FontWeight.Light,
                 textAlign = TextAlign.Center
             ),
-            color = when (onceData.Day.IconPhrase) {
-                "Cloudy", "Rain", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Mostly cloudy w/ showers" -> {
-                    White
-                }
-
-                "Snow", "Lightning", "Hazy sunshine" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            }
+            color = textColorWithIcon(iconPhrase)
         )
 
 
@@ -262,23 +163,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = when (onceData.Day.IconPhrase) {
-                        "Cloudy", "Rain", "Lightning" -> {
-                            White
-                        }
-
-                        "Snow" -> {
-                            DarkBlue
-                        }
-
-                        "Sunny" -> {
-                            White
-                        }
-
-                        else -> {
-                            White
-                        }
-                    }
+                    color = textColorWithIcon(iconPhrase)
                 )
 
                 Text(
@@ -289,23 +174,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = when (onceData.Day.IconPhrase) {
-                        "Cloudy", "Rain", "Lightning" -> {
-                            White
-                        }
-
-                        "Snow" -> {
-                            DarkBlue
-                        }
-
-                        "Sunny" -> {
-                            White
-                        }
-
-                        else -> {
-                            White
-                        }
-                    }
+                    color = textColorWithIcon(iconPhrase)
                 )
 
             }
@@ -326,23 +195,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = when (onceData.Day.IconPhrase) {
-                        "Cloudy", "Rain", "Lightning" -> {
-                            White
-                        }
-
-                        "Snow" -> {
-                            DarkBlue
-                        }
-
-                        "Sunny" -> {
-                            White
-                        }
-
-                        else -> {
-                            White
-                        }
-                    }
+                    color = textColorWithIcon(iconPhrase)
                 )
 
                 Text(
@@ -353,23 +206,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
                         fontFamily = FontFamily.SansSerif,
                         fontWeight = FontWeight.Bold
                     ),
-                    color = when (onceData.Day.IconPhrase) {
-                        "Cloudy", "Rain", "Lightning" -> {
-                            White
-                        }
-
-                        "Snow" -> {
-                            DarkBlue
-                        }
-
-                        "Sunny" -> {
-                            White
-                        }
-
-                        else -> {
-                            White
-                        }
-                    }
+                    color = textColorWithIcon(iconPhrase)
                 )
 
             }
@@ -378,7 +215,7 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>) {
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        DailyForecast(dataList, onceData.Day.IconPhrase, onceData)
+        DailyForecast(dataList, iconPhrase, onceData)
 
     }
 
@@ -406,19 +243,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
         Text(
             text = "Day",
             modifier = Modifier.padding(start = 18.dp, bottom = 4.dp),
-            color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            },
+            color = textColorWithIcon(iconPhrase),
             style = TextStyle(fontWeight = FontWeight.Bold)
         )
 
@@ -429,7 +254,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
         ) {
 
             items(data.size , key = { it }) {
-                DailyForecastDayItem(data[it], onceData)
+                DailyForecastDayItem(data[it], onceData , iconPhrase)
             }
 
         }
@@ -442,7 +267,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
         ) {
 
             items(data.size , key = { it }) {
-                DailyForecastNightItem(data[it], onceData)
+                DailyForecastNightItem(data[it], onceData , iconPhrase)
             }
 
         }
@@ -452,19 +277,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
         Text(
             text = "Night",
             modifier = Modifier.padding(start = 18.dp, top = 4.dp , bottom = 18.dp),
-            color = when (iconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            },
+            color = textColorWithIcon(iconPhrase),
             style = TextStyle(fontWeight = FontWeight.Bold)
         )
     }
@@ -487,7 +300,7 @@ fun DailyForecast(data: List<DailyForecast>, iconPhrase: String, onceData: Daily
 }
 
 @Composable
-fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast) {
+fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast, iconPhrase: String) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -506,35 +319,15 @@ fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast) {
             )
     ) {
 
-
-        //convert date to day
-        val inputString = data.Date.substring(0, 10)
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val date = format.parse(inputString)
-        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date!!)
-
-
         Text(
-            text = dayOfWeek,
+            text = dateToDay(data.Date),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(8.dp),
-            color = when (data.Night.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow", "Lightning" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            }
+            color = textColorWithIcon(iconPhrase)
         )
 
         AsyncImage(
@@ -542,97 +335,17 @@ fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast) {
                 .size(52.dp)
                 .padding(top = 4.dp),
             contentDescription = null,
-            model = when (data.Day.IconPhrase) {
-                "Cloudy" -> {
-                    R.drawable.cloudy
-                }
-
-                "Clear" -> {
-                    R.drawable.moon
-                }
-
-                "Mostly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly sunny" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Mostly clear" -> {
-                    R.drawable.partly_clear
-                }
-
-                "Intermittent clouds" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Mostly sunny" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Lightning" -> {
-                    R.drawable.lightning
-                }
-
-                "Snow" -> {
-                    R.drawable.snowy
-                }
-
-                "Sunny" -> {
-                    R.drawable.suny
-                }
-
-                "Rain" -> {
-                    R.drawable.rainy
-                }
-
-                "Showers" -> {
-                    R.drawable.rainy
-                }
-
-                "Hazy sunshine" -> {
-                    R.drawable.fog
-                }
-
-                "Hazy moonlight" -> {
-                    R.drawable.partly_clear
-                }
-
-                else -> {
-                    R.drawable.suny
-                }
-            }
+            model = imageDayStatus(data.Day.IconPhrase)
         )
 
-        //convert f to c temperature
-        val temp = data.Temperature.Maximum.Value
-        val temperature = ((temp - 32) / 1.8).toInt()
-
         Text(
-            text = "$temperature°",
+            text = convertFarenToCele(data.Temperature.Minimum.Value) + "°",
             style = TextStyle(
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color = when (data.Day.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            },
+            color = textColorWithIcon(iconPhrase),
             modifier = Modifier.padding(top = 8.dp , bottom = 24.dp)
         )
     }
@@ -640,7 +353,7 @@ fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast) {
 
 
 @Composable
-fun DailyForecastNightItem(data: DailyForecast, onceData: DailyForecast) {
+fun DailyForecastNightItem(data: DailyForecast, onceData: DailyForecast, iconPhrase: String) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -659,136 +372,34 @@ fun DailyForecastNightItem(data: DailyForecast, onceData: DailyForecast) {
             )
     ) {
 
-
-        //convert f to c temperature
-        val temp = data.Temperature.Minimum.Value
-        val temperature = ((temp - 32) / 1.8).toInt()
-
         Text(
-            text = "$temperature°",
+            text = convertFarenToCele(data.Temperature.Minimum.Value) + "°",
             style = TextStyle(
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Bold
             ),
-            color = when (data.Day.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            },
+            color = textColorWithIcon(iconPhrase),
             modifier = Modifier.padding(bottom = 8.dp  , top = 24.dp)
         )
-
-
 
         AsyncImage(
             modifier = Modifier
                 .size(52.dp)
                 .padding(top = 4.dp),
             contentDescription = null,
-            model = when (data.Night.IconPhrase) {
-                "Cloudy" -> {
-                    R.drawable.cloudy
-                }
-
-                "Clear" -> {
-                    R.drawable.moon
-                }
-
-                "Mostly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly sunny" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Partly cloudy" -> {
-                    R.drawable.sun_cloudy
-                }
-
-                "Mostly clear" -> {
-                    R.drawable.partly_clear
-                }
-
-                "Intermittent clouds" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Mostly sunny" -> {
-                    R.drawable.mostly_sunny
-                }
-
-                "Lightning" -> {
-                    R.drawable.lightning
-                }
-
-                "Snow" -> {
-                    R.drawable.snowy
-                }
-
-                "Sunny" -> {
-                    R.drawable.suny
-                }
-
-                "Rain" -> {
-                    R.drawable.rainy
-                }
-
-                "Showers" -> {
-                    R.drawable.rainy
-                }
-
-                "Hazy sunshine" -> {
-                    R.drawable.fog
-                }
-
-                "Hazy moonlight" -> {
-                    R.drawable.partly_clear
-                }
-
-                else -> {
-                    R.drawable.moon
-                }
-            }
+            model = imageDayStatus(data.Night.IconPhrase)
         )
 
-        //convert date to day
-        val inputString = data.Date.substring(0, 10)
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val date = format.parse(inputString)
-        val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(date!!)
-
-
         Text(
-            text = dayOfWeek,
+            text = dateToDay(data.Date),
             style = TextStyle(
                 fontSize = 16.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             ),
             modifier = Modifier.padding(8.dp),
-            color = when (data.Day.IconPhrase) {
-                "Cloudy", "Rainy", "Lightning", "Sunny", "Mostly cloudy", "Mostly clear", "Intermittent clouds", "Mostly sunny", "Hazy sunshine" -> {
-                    White
-                }
-
-                "Snow" -> {
-                    DarkBlue
-                }
-
-                else -> {
-                    White
-                }
-            }
+            color = textColorWithIcon(iconPhrase)
         )
 
 
