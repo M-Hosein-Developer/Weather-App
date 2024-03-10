@@ -43,6 +43,7 @@ class MainViewModel @Inject constructor(private val repository: HomeRepository) 
 
     //5 day forecast
     fun search5DayForecast(): List<DailyForecast> {
+
         viewModelScope.launch(coroutineExceptionHandler) {
             search5day.value = repository.search5DayForecast(keyCity.value)
         }

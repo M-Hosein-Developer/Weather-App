@@ -1,6 +1,7 @@
 package com.example.weatherapp.ui.feature
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.weatherapp.R
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.model.dataClass.Search12HourForecast
 import com.example.weatherapp.ui.theme.noColor
@@ -59,11 +66,7 @@ import com.example.weatherapp.viewModel.MainViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(
-    mainViewModel: MainViewModel,
-    navController: NavHostController,
-    onClickedGetLocation: () -> Unit
-) {
+fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController, onClickedGetLocation: () -> Unit) {
 
     //get data from view model
     val data5Day = mainViewModel.search5DayForecast()
@@ -75,36 +78,56 @@ fun HomeScreen(
     val temperature = ((temp - 32) / 1.8).toInt()
 
 
-    //screen
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = backgroundColor(iconPhrase)
+    if (data5Day.size >= 2) {
+
+        //screen
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = backgroundColor(iconPhrase)
+                    )
                 )
+        ) {
+
+            //tool bar
+            HomeScreenToolbar(
+                mainViewModel.city.value,
+                iconPhrase,
+                mainViewModel.isGettingLocation.value,
+                {
+                    onClickedGetLocation.invoke()
+                    mainViewModel.getLocation()
+                },
+                {
+                    navController.navigate(MyScreens.SearchScreen.route + "/" + it)
+                }
             )
-    ) {
 
-        //tool bar
-        HomeScreenToolbar(
-            mainViewModel.city.value,
-            iconPhrase,
-            mainViewModel.isGettingLocation.value,
-            {
-                onClickedGetLocation.invoke()
-                mainViewModel.getLocation()
-            },
-            {
-                navController.navigate(MyScreens.SearchScreen.route + "/" + it)
+            //today status
+            WeatherStatus(data5Day, data12Hour, iconPhrase, temperature) {
+                navController.navigate(MyScreens.DetailScreen.route + "/" + it)
             }
-        )
-
-        //today status
-        WeatherStatus(data5Day, data12Hour, iconPhrase, temperature){
-            navController.navigate(MyScreens.DetailScreen.route + "/" + it)
         }
+
+    }else{
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = backgroundColor(iconPhrase)
+                    )
+                )
+        ) {
+
+            Toast.makeText(LocalContext.current, "please wait", Toast.LENGTH_SHORT).show()
+        }
+
     }
+
 }
 
 
@@ -427,4 +450,19 @@ fun DotsTyping() {
         Spacer(Modifier.width(spaceSize))
         Dot(offset3)
     }
+}
+
+//loading animation
+@Composable
+fun Loader() {
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading_anime)
+    )
+
+    LottieAnimation(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier.size(150.dp),
+    )
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.weatherapp.R
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.ui.theme.backgroundItem
 import com.example.weatherapp.util.MyScreens
@@ -104,11 +110,16 @@ fun SearchBox(edtValue: String, icon: ImageVector, hint: String, iconPhrase: Str
 //Search Result
 @Composable
 fun SearchResult(dailyResult: List<DailyForecast>, mainViewModel: MainViewModel , onClickedItem :(String) -> Unit) {
-    LazyColumn {
-        items(dailyResult.size) {
-            SearchResultItem(dailyResult[it] , mainViewModel , onClickedItem)
-            Log.v("testSearch" , dailyResult[it].EpochDate.toString())
+
+    if (dailyResult.size >= 2) {
+        LazyColumn {
+            items(dailyResult.size) {
+                SearchResultItem(dailyResult[it], mainViewModel, onClickedItem)
+                Log.v("testSearch", dailyResult[it].EpochDate.toString())
+            }
         }
+    }else{
+        Loading()
     }
 }
 
@@ -120,7 +131,7 @@ fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel 
             .fillMaxWidth()
             .height(240.dp)
             .padding(horizontal = 16.dp)
-            .padding(top = 12.dp ,  bottom = 12.dp)
+            .padding(top = 12.dp, bottom = 12.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundItem)
             .clickable { onClickedItem.invoke(dailyForecast.EpochDate.toString()) },
@@ -188,4 +199,19 @@ fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel 
             )
         }
     }
+}
+
+//loading animation
+@Composable
+fun Loading() {
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.loading_anime)
+    )
+
+    LottieAnimation(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier.size(150.dp),
+    )
 }
