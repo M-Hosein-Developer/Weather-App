@@ -15,14 +15,13 @@ val EMPTY_DATA_5Day = listOf(
 
     DailyForecast(
         "2024-02-19T07:00:00+03:30",
-        Day1(false, -1, "Mostly cloudy"),
+        Day1(false, 1, "Mostly cloudy"),
         121214333,
         "",
         Night1(false, -1, ""),
         listOf(""),
         Temperature1(Maximum1("" , -1 , 0.0) , Minimum1("" , -1 , 0.0))
     )
-
 )
 
 val EMPTY_DATA_12HOUR = listOf(
@@ -37,7 +36,7 @@ val EMPTY_DATA_12HOUR = listOf(
         "",
         -1,
         Search12HourForecast.Temperature1("" , -1 , 0.0),
-        -1
+        1
         )
 
 )

@@ -1,7 +1,6 @@
 package com.example.weatherapp.ui.feature
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -48,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -120,10 +121,12 @@ fun HomeScreen(mainViewModel: MainViewModel, navController: NavHostController, o
                     brush = Brush.verticalGradient(
                         colors = backgroundColor(iconPhrase)
                     )
-                )
+                ),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Toast.makeText(LocalContext.current, "please wait", Toast.LENGTH_SHORT).show()
+            Loader()
+            Text(text = "Please Waite..." , style = TextStyle(fontSize = 18.sp))
         }
 
     }
@@ -207,10 +210,14 @@ fun WeatherStatus(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+
         AsyncImage(
             modifier = Modifier.size(130.dp),
             contentDescription = null,
-            model = imageDayStatus(data5Day[0].Day.IconPhrase)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(data5Day[0].Day.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build()
         )
 
         Text(
@@ -299,8 +306,11 @@ fun ForecastDayItem(data: DailyForecast , iconPhrase: String , onClickedDayItem 
             modifier = Modifier
                 .size(52.dp)
                 .padding(top = 4.dp),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(data.Day.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentDescription = null,
-            model = imageDayStatus(data.Day.IconPhrase)
         )
 
 
@@ -375,7 +385,10 @@ fun ForecastHourItem(data: Search12HourForecast, iconPhrase: String) {
                 .size(52.dp)
                 .padding(top = 4.dp),
             contentDescription = null,
-            model = imageDayStatus(data.IconPhrase)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(data.WeatherIcon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build()
         )
 
         Text(

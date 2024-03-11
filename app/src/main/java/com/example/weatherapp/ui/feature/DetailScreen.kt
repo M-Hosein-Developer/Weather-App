@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.example.weatherapp.model.dataClass.DailyForecast
 import com.example.weatherapp.ui.theme.DarkBlue
 import com.example.weatherapp.ui.theme.White
@@ -132,7 +135,11 @@ fun DailyStatus(onceData: DailyForecast, dataList: List<DailyForecast>, iconPhra
         AsyncImage(
             modifier = Modifier.size(130.dp),
             contentDescription = null,
-            model = imageDayStatus(onceData.Day.IconPhrase)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(onceData.Day.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build()
+
         )
 
         Text(
@@ -335,7 +342,10 @@ fun DailyForecastDayItem(data: DailyForecast, onceData: DailyForecast, iconPhras
                 .size(52.dp)
                 .padding(top = 4.dp),
             contentDescription = null,
-            model = imageDayStatus(data.Day.IconPhrase)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(data.Day.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build()
         )
 
         Text(
@@ -388,7 +398,10 @@ fun DailyForecastNightItem(data: DailyForecast, onceData: DailyForecast, iconPhr
                 .size(52.dp)
                 .padding(top = 4.dp),
             contentDescription = null,
-            model = imageDayStatus(data.Night.IconPhrase)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(data.Night.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build()
         )
 
         Text(

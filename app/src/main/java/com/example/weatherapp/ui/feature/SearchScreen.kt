@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -143,7 +146,10 @@ fun SearchResultItem(dailyForecast: DailyForecast, mainViewModel: MainViewModel 
                 .size(110.dp)
                 .padding(8.dp)
                 .padding(top = 12.dp),
-            model = imageDayStatus(dailyForecast.Day.IconPhrase),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageDayStatus(dailyForecast.Day.Icon))
+                .decoderFactory(SvgDecoder.Factory())
+                .build(),
             contentDescription = null
         )
 

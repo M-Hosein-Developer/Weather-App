@@ -78,7 +78,8 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
 
     //Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-svg:2.6.0")
 
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

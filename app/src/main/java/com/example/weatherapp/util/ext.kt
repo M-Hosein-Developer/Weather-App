@@ -2,7 +2,6 @@ package com.example.weatherapp.util
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.example.weatherapp.R
 import com.example.weatherapp.ui.theme.DarkBlue
 import com.example.weatherapp.ui.theme.LightBlue
 import com.example.weatherapp.ui.theme.White
@@ -52,88 +51,8 @@ fun backgroundColor(icon : String) : List<Color>{
     }
 }
 
-fun imageDayStatus(icon : String) : Int{
-    return when (icon) {
-        "Cloudy" -> {
-            R.drawable.cloudy
-        }
-
-        "Flurries" -> {
-            R.drawable.tyfoon
-        }
-
-        "Rain and snow" -> {
-            R.drawable.rain_snow
-        }
-
-        "Partly sunny w/ showers" -> {
-            R.drawable.sun_cloudy
-        }
-
-        "Mostly cloudy w/ showers" -> {
-            R.drawable.sun_cloudy
-        }
-
-        "Partly cloudy w/ showers" -> {
-            R.drawable.mostly_sunny
-        }
-
-        "Clear" -> {
-            R.drawable.moon
-        }
-
-        "Mostly cloudy" -> {
-            R.drawable.sun_cloudy
-        }
-
-        "Partly sunny" -> {
-            R.drawable.sun_cloudy
-        }
-
-        "Partly cloudy" -> {
-            R.drawable.sun_cloudy
-        }
-
-        "Mostly clear" -> {
-            R.drawable.partly_clear
-        }
-
-        "Intermittent clouds" -> {
-            R.drawable.mostly_sunny
-        }
-
-        "Mostly sunny" -> {
-            R.drawable.mostly_sunny
-        }
-
-        "Lightning" -> {
-            R.drawable.lightning
-        }
-
-        "Snow" -> {
-            R.drawable.snowy
-        }
-
-        "Sunny" -> {
-            R.drawable.suny
-        }
-
-        "Rainy" -> {
-            R.drawable.rainy
-        }
-
-        "Hazy sunshine" -> {
-            R.drawable.fog
-        }
-
-        "Hazy moonlight" -> {
-            R.drawable.partly_clear
-        }
-
-        else -> {
-            R.drawable.background1
-        }
-    }
+fun imageDayStatus(icon : Int) : String{
+    return "https://www.accuweather.com/images/weathericons/$icon.svg"
 }
 
 fun dateToDay(date: String): String {
@@ -147,3 +66,4 @@ fun convertFarenToCele(temp : Double) : String{
     val result = ((temp - 32) / 1.8).toInt()
     return "$result°"
 }
+
